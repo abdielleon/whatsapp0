@@ -134,9 +134,51 @@ client.on('authenticated', () => {
     console.log('AUTHENTICATED'); 
 });
 
+/**
+ * Start Abdiel API
+ * 
+ * TODO:
+ * Integrate this into the api!
+ */
+app.get('/api/chatbot/send-messages', (req, res) => {
+    res.send(req.query.hi);
+});
+app.post('/api/chatbot/send-messages', (req, res) => {
+
+    // Add validation here using 'passport'
+    // https://levelup.gitconnected.com/node-js-basics-add-authentication-to-an-express-app-with-passport-55a181105263
+
+    sendMessageMassive(req);
+});
+const sendMessageMassive = async (req) => {
+    const contacts = req.body.contacts;
+    const message = req.body.message;
+
+    const trigger = "massive";
+
+    for ( const contact of contacts ) {
+
+        let {name, number, code} = contact;
+
+        const text = message.replace('%NAME%', name);
+        
+        await sendMessage (client, number, text, trigger);
+        
+        // wait before sendin another message
+        delayFunction(process.env.MASSIVE_MESSAGES_DELAY || 2000);
+    }
+}
+const delayFunction = (milliseconds) => {
+    return new Promise(resolve => {
+        setTimeout(resolve, milliseconds);
+    });
+}
+/* End Abdiel API */
+
 client.initialize();
 
 server.listen(port, () => {
     console.log(`El server esta listo por el puerto ${port}`);
 });
+
 checkEnvFile();

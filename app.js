@@ -165,7 +165,7 @@ const sendMessageMassive = async (req) => {
         await sendMessage (client, number, text, trigger);
         
         // wait before sendin another message
-        delayFunction(process.env.MASSIVE_MESSAGES_DELAY || 2000);
+        // delayFunction(process.env.MASSIVE_MESSAGES_DELAY || 2000);
     }
 }
 const delayFunction = (milliseconds) => {

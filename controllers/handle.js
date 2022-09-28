@@ -83,6 +83,8 @@ const isValidNumber = (rawNumber) => {
 /**
  * By Abdiel: Check if body starts with test word
  * 
+ * TODO: Move this away from the source repository files, as it might get overwritten when updating!
+ * 
  * @param   {String} messageBody  Message text
  * @returns {Boolean}
  */
@@ -95,7 +97,7 @@ const hasTestWord = (messageBody) => {
         console.log('bodyLower.startsWith(testWord)');
         console.log(bodyLower.startsWith(testWord));
         return true;
-    }        
+    }
 
     return false;
 }

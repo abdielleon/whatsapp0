@@ -1,3 +1,4 @@
+const fs = require('fs');
 require('dotenv').config();
 const qrcode = require('qrcode-terminal');
 const { getMessages, responseMessages, bothResponse } = require('./controllers/flows');
@@ -18,9 +19,12 @@ app.use(cors());
 app.use(express.json());
 
 const server = require('http').Server(app);
+const https = require('https');
 const port = process.env.PORT || 3000;
+const portHttps = process.env.PORTHTTPS || 4000;
 // var client;
 app.use('/', require('./routes/web'));
+app.use(express.static(__dirname + '/static', { dotfiles: 'allow' }))
 
 /**
  * Listen to incoming message
@@ -40,27 +44,24 @@ app.use('/', require('./routes/web'));
         return
     }
 
-    // console.log('message');
-    // console.log(message);
-    
     if(messageBody === 'ping') {
 
         // Answer as a WhatsApp reply
-		message.reply('pong');
+                message.reply('pong');
 
         // Answer as a new message
         client.sendMessage(message.from, 'pong2');
 
         return;
-	}
+        }
 
     console.log('BODY',messageBody)
     const number = cleanNumber(message.from);
     await readChat(number, messageBody);
-    
+
     /**
      * Guardamos el archivo multimedia que envia
-     * 
+     *
      * 2022-09-27 Abdiel: Added conditional if(media){},
      *  to avoid this error: → TypeError: Cannot read properties of undefined (reading 'extensions')
      */
@@ -91,19 +92,25 @@ app.use('/', require('./routes/web'));
 
             // If messageBody starts with test word
             if(!hasTestWord(messageBody)) {
-                
+
                 // client.sendMessage(message.from, `Gracias por escribirme. Si quieres probar el bot, inicia tus mensajes con la palabra "${testWord}". Ejemplo: "${testWord} Hola" `);
-                
+
                 return;
             }
 
             // Remove test word
             messageBody = messageBody.replace(testWord, '');
-            
+
         }
 
+        // Insert number before body text
         messageBody = number.replace('@c.us', '') + ' ' + messageBody;
-                
+
+        // Handle Large texts
+        if(messageBody.length > 256) {
+            messageBody = messageBody.substring(0,255);
+        };
+
         const response = await bothResponse(messageBody);
 
         const trigger = process.env.DIALOGFLOW_AGENT
@@ -132,72 +139,148 @@ client.on('qr', qr => {
 
 client.on('ready', () => {
     console.log('Client is ready!');
-    
+
     // Start listening
     listenToMessage();
 });
 
 client.on('auth_failure', (e) => {
-    console.log(e)
-    connectionLost()
+    console.log("🚀 🚀 🚀 ~ e", e);
+    connectionLost();
 });
 
 client.on('authenticated', () => {
-    console.log('AUTHENTICATED'); 
+    console.log('AUTHENTICATED');
 });
 
 client.initialize();
 
 /**
  * Start Abdiel API
- * 
+ *
  * TODO:
  * Integrate this into the api!
  */
 app.get('/api/chatbot/send-messages', (req, res) => {
     res.send(req.query.hi);
 });
-app.post('/api/chatbot/send-messages', (req, res) => {
+app.post('/api/chatbot/send-messages', async (req, res) => {
 
     // Add validation here using 'passport'
     // https://levelup.gitconnected.com/node-js-basics-add-authentication-to-an-express-app-with-passport-55a181105263
 
-    sendMessageMassive(req);
+    const trigger = req.body.trigger;
+    let responseText = 'No action.';
 
-    res.send('Message has been processed!');
+    // console.log('💡 💡 💡 req: '); //
+    console.log('Entered api', new Date());
+    console.log(req.body);
+
+
+    if (trigger == 'te-io'){
+        responseText = await sendApiMessage(req);
+        res.send(responseText);
+        return;
+    }
+
+    res.send(responseText);
 
 });
-const sendMessageMassive = async (req) => {
+const sendApiMessage = async (req) => {
     const contacts = req.body.contacts;
-    const message = req.body.message;
+    // const message = req.body.message;
+    const trigger = req.body.trigger;
 
-    const trigger = "massive";
+    const messages = req.body.messages;
+
+    // console.log("🚀 ~ req.body", req.body);
 
     try {
-        for ( const contact of contacts ) {
-    
-            let {name, number, code} = contact;
-    
-            const text = message.replace('%NAME%', name);
-            
-            await sendMessage (client, number, text, trigger);
-            
-            // wait before sendin another message
-            // delayFunction(process.env.MASSIVE_MESSAGES_DELAY || 2000);
+        for await ( const contact of contacts ) {
+
+            // Wait before sending text/s to each contact
+            // await randomDelayFunction(Number(process.env.API_MESSAGES_DELAY), 0.5);
+
+            let {name, number, code}               = contact;
+            let {lesson_time, day_name, time_zone} = contact;
+            let {value_1, value_2, value_3}        = contact;
+
+            for (const message of messages){
+
+                let text = message;
+
+                // Values to be replaced
+                const mapObj = {
+                    "%NAME%" : name ?? '',
+                    "%CODE%" : code ?? '',
+                    "%LESSON_TIME%" : lesson_time ?? '',
+                    "%DAY_NAME%"    : day_name    ?? '',
+                    "%TIME_ZONE%"   : time_zone   ?? '',
+                    "%VALUE_1%" : value_1 ?? '',
+                    "%VALUE_2%" : value_2 ?? '',
+                    "%VALUE_3%" : value_3 ?? '',
+                };
+                const regex = /%NAME%|%CODE%%|%LESSON_TIME%|%DAY_NAME%|%TIME_ZONE%|%VALUE_1%|%VALUE_2%|%VALUE_3%/gi;
+
+                // Replace values
+                text = text.replace(regex, matched => mapObj[matched]);
+
+                // Send message
+                console.log('Will send message', new Date());
+                await sendMessage (client, number, text, trigger);
+
+                // Wait after every text in sent
+                await randomDelayFunction(Number(process.env.API_MESSAGES_DELAY), 0.5);
+            }
         }
+        return "Messages have been processed.";
     } catch (err) {
         return err;
     }
 }
-const delayFunction = (milliseconds) => {
+/**
+ *
+ * @param {Int} milliseconds    time to wait
+ * @returns Promise
+ */
+ const delayFunction = (milliseconds) => {
     return new Promise(resolve => {
         setTimeout(resolve, milliseconds);
     });
 }
+/**
+ *
+ * @param {Int} milliseconds  approximate time to wait
+ * @param {Float} timeFloat   0 to 1. Variation of that time both over and under, has to be less than the other param
+ * @returns Promise
+ */
+ const randomDelayFunction = async (milliseconds, timeFloat = null) => {
+
+    let range = Number(milliseconds * timeFloat);
+
+    // Random time witihin a margin of ms over and ms under the declared milliseconds
+    const randomTime = Math.floor(Math.random() * (Number(milliseconds) + range + 1));
+
+    return await delayFunction(randomTime);
+}
 /* End Abdiel API */
+
+app.get('/', (req, res) => {
+  res.send('Hello you!')
+});
 
 server.listen(port, () => {
     console.log(`El server esta listo por el puerto ${port}`);
 });
+
+if (process.env.ENVIRONMENT == 'production' ){
+    https.createServer({
+        key: fs.readFileSync('/etc/letsencrypt/live/academic-bot.topenglish.us/privkey.pem'),
+        cert: fs.readFileSync('/etc/letsencrypt/live/academic-bot.topenglish.us/fullchain.pem'),
+    }, app)
+    .listen(process.env.PORTHTTPS, () => {
+        console.log('Listening securely...')
+    });
+}
 
 checkEnvFile();

@@ -106,7 +106,7 @@ app.use(express.static(__dirname + '/static', { dotfiles: 'allow' }))
         // Insert number before body text
         messageBody = number.replace('@c.us', '') + ' ' + messageBody;
 
-        // Handle Large texts
+        // Handle Large texts!
         if(messageBody.length > 256) {
             messageBody = messageBody.substring(0,255);
         };
@@ -173,7 +173,7 @@ app.post('/api/chatbot/send-messages', async (req, res) => {
     let responseText = 'No action.';
 
     // console.log('💡 💡 💡 req: '); //
-    console.log('Entered api', new Date());
+    console.log('Entered api: ', new Date());
     console.log(req.body);
 
 
@@ -233,10 +233,10 @@ const sendApiMessage = async (req) => {
                 await randomDelayFunction(Number(process.env.API_MESSAGES_DELAY), 0.5);
             }
         }
-        return "Messages have been processed.";
     } catch (err) {
         return err;
     }
+    return "Messages have been processed.";
 }
 /**
  *

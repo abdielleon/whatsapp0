@@ -20,21 +20,20 @@ const { sendMedia, sendMessage, lastTrigger, sendMessageButton, readChat } = req
 // Require library with LocalAuth strtagey
 const { Client, LocalAuth } = require('whatsapp-web.js');
 
-const app = express();
-app.use(cors());
-app.use(express.json());
+// const app = express();
+// app.use(cors());
+// app.use(express.json());
 
-const server = require('http').Server(app);
-const https = require('https');
-const port = process.env.PORT || 3000;
-const portHttps = process.env.PORTHTTPS || 4000;
-// var client;
-app.use('/', require('./routes/web'));
-app.use(express.static(__dirname + '/static', { dotfiles: 'allow' }))
-
+// const server = require('http').Server(app);
+// const https = require('https');
+// const port = process.env.PORT || 3000;
+// const portHttps = process.env.PORTHTTPS || 4000;
+// // var client;
+// app.use('/', require('./routes/web'));
+// app.use(express.static(__dirname + '/static', { dotfiles: 'allow' }))
 
 // Start the code from the repository
-require('./app')
+const { app } = require('./app')
 
 
 /**

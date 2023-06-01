@@ -157,6 +157,7 @@ client.initialize();
 
 
 
+
 server.listen(port, () => {
     console.log(`El server esta listo por el puerto ${port}`);
 });
@@ -175,4 +176,4 @@ checkEnvFile();
 
 
 // Abdiel
-module.exports = app;
+module.exports = {app};

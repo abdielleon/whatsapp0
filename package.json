@@ -2,7 +2,7 @@
   "name": "whatsapp1",
   "version": "1.0.0",
   "description": "app.js\r controllers\\handle.js\r adapter\\index.js\r adapter\\diaglogflow.js",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -28,9 +28,8 @@
     "stable": "^0.1.8",
     "stormdb": "^0.6.0",
     "uuid": "^8.3.2",
-    "whatsapp-web.js": "^1.17.1"
+    "whatsapp-web.js": "^1.19.5"
   },
-  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/abdielleon/whatsapp1-academic.git"

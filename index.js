@@ -2,6 +2,10 @@
  * index.js
  * 
  * Created by Abdiel
+ * 
+ * 2023-06-01: This is not working!
+ * I copied all the code in this file into app.js (Please, start app from app.js insted of here).
+ * 
  */
 
 const fs = require('fs');

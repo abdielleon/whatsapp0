@@ -228,11 +228,11 @@ const sendApiMessage = async (req) => {
                     "%VALUE_3%" : value_3 ?? '',
 
                     "%PAYMENT_DAY%" : payment_day ?? '',
-                    "%CURRENCY%" : currency ?? '',
+                    "%CURRENCY%"    : currency ?? '',
                     "%PAYMENT_DATE_1%" : payment_date_1 ?? '',
-                    "%AMOUNT_1%" : amount_1 ?? '',
+                    "%AMOUNT_1%"       : amount_1 ?? '',
                     "%PAYMENT_DATE_2%" : payment_date_2 ?? '',
-                    "%AMOUNT_2%" : amount_2 ?? '',
+                    "%AMOUNT_2%"       : amount_2 ?? '',
 
                 };
                 const regex = /%NAME%|%CODE%%|%LESSON_TIME%|%DAY_NAME%|%TIME_ZONE%|%VALUE_1%|%VALUE_2%|%VALUE_3%/gi;

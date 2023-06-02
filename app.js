@@ -167,7 +167,7 @@ app.get('/', (req, res) => {
   });
 app.get('/api/chatbot/send-messages', (req, res) => {
     res.send('Hello');
-    res.send(req.query.hi);
+    // res.send(req.query.hi);
 });
 app.post('/api/chatbot/send-messages', async (req, res) => {
 

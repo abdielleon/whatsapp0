@@ -210,6 +210,10 @@ const sendApiMessage = async (req) => {
             let {lesson_time, day_name, time_zone} = contact;
             let {value_1, value_2, value_3}        = contact;
 
+            let {payment_day, currency}    = contact;
+            let {payment_date_1, amount_1} = contact;
+            let {payment_date_2, amount_2} = contact;
+
             for (const message of messages){
 
                 let text = message;

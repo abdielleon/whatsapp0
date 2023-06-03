@@ -210,19 +210,25 @@ const sendApiMessage = async (req) => {
             let {lesson_time, day_name, time_zone} = contact;
             let {value_1, value_2, value_3}        = contact;
 
-            let {payment_day, currency}    = contact;
-            let {payment_date_1, amount_1} = contact;
-            let {payment_date_2, amount_2} = contact;
+            let {customer_name, plan, currency} = contact;
+            let {payment_day, payment_month}    = contact;
+            let {payment_date_1, amount_1}      = contact;
+            let {payment_date_2, amount_2}      = contact;
+
+            // console.log('contact: ');
+            // console.log(contact);
 
             for (const message of messages){
 
                 let text = message;
 
+                // ------------------------------------------
+                // (1) map the values
+
                 // Values to be replaced
                 const mapObj = {
                     "%NAME%" : name ?? '',
-                    "%%CUSTOMER_NAME%" : customer_name ?? '',
-
+                    
                     "%CODE%" : code ?? '',
                     "%LESSON_TIME%" : lesson_time ?? '',
                     "%DAY_NAME%"    : day_name    ?? '',
@@ -230,20 +236,31 @@ const sendApiMessage = async (req) => {
                     "%VALUE_1%" : value_1 ?? '',
                     "%VALUE_2%" : value_2 ?? '',
                     "%VALUE_3%" : value_3 ?? '',
+                    
+                    "%CUSTOMER_NAME%" : customer_name ?? '',
+                    "%PLAN%"          : plan ?? '',
+                    "%CURRENCY%"      : currency ?? '',
+                    
+                    "%PAYMENT_DAY%"   : payment_day ?? '',
+                    "%PAYMENT_MONTH%" : payment_month ?? '',
 
-                    "%PAYMENT_DAY%" : payment_day ?? '',
-                    "%CURRENCY%"    : currency ?? '',
                     "%PAYMENT_DATE_1%" : payment_date_1 ?? '',
                     "%AMOUNT_1%"       : amount_1 ?? '',
                     "%PAYMENT_DATE_2%" : payment_date_2 ?? '',
                     "%AMOUNT_2%"       : amount_2 ?? '',
 
                 };
-                const regex = /%NAME%|%CODE%%|%LESSON_TIME%|%DAY_NAME%|%TIME_ZONE%|%VALUE_1%|%VALUE_2%|%VALUE_3%/gi;
 
-                // Replace values
+                // ------------------------------------------
+                // (2) Create the regex
+
+                const regex = /%NAME%|%CODE%%|%LESSON_TIME%|%DAY_NAME%|%TIME_ZONE%|%VALUE_1%|%VALUE_2%|%VALUE_3%|%CUSTOMER_NAME%|%PLAN%|%PAYMENT_DAY%|%PAYMENT_MONTH%|%CURRENCY%|%PAYMENT_DATE_1%|%AMOUNT_1%|%PAYMENT_DATE_2%|%AMOUNT_2%/gi;
+
+                // ------------------------------------------
+                // (3) Replace values
                 text = text.replace(regex, matched => mapObj[matched]);
 
+                // ------------------------------------------
                 // Send message
                 console.log('Will send message', new Date());
                 await sendMessage (client, number, text, trigger);

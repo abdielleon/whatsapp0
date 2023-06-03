@@ -211,6 +211,7 @@ const sendApiMessage = async (req) => {
             let {value_1, value_2, value_3}        = contact;
 
             let {customer_name, plan, currency} = contact;
+            let {payment_month_name}            = contact;
             let {payment_day, payment_month}    = contact;
             let {payment_date_1, amount_1}      = contact;
             let {payment_date_2, amount_2}      = contact;
@@ -243,6 +244,7 @@ const sendApiMessage = async (req) => {
                     
                     "%PAYMENT_DAY%"   : payment_day ?? '',
                     "%PAYMENT_MONTH%" : payment_month ?? '',
+                    "%PAYMENT_MONTH_NAME%" : payment_month_name ?? '',
 
                     "%PAYMENT_DATE_1%" : payment_date_1 ?? '',
                     "%AMOUNT_1%"       : amount_1 ?? '',
@@ -254,7 +256,7 @@ const sendApiMessage = async (req) => {
                 // ------------------------------------------
                 // (2) Create the regex
 
-                const regex = /%NAME%|%CODE%%|%LESSON_TIME%|%DAY_NAME%|%TIME_ZONE%|%VALUE_1%|%VALUE_2%|%VALUE_3%|%CUSTOMER_NAME%|%PLAN%|%PAYMENT_DAY%|%PAYMENT_MONTH%|%CURRENCY%|%PAYMENT_DATE_1%|%AMOUNT_1%|%PAYMENT_DATE_2%|%AMOUNT_2%/gi;
+                const regex = /%NAME%|%CODE%%|%LESSON_TIME%|%DAY_NAME%|%TIME_ZONE%|%VALUE_1%|%VALUE_2%|%VALUE_3%|%CUSTOMER_NAME%|%PLAN%|%PAYMENT_MONTH_NAME%|%PAYMENT_DAY%|%PAYMENT_MONTH%|%CURRENCY%|%PAYMENT_DATE_1%|%AMOUNT_1%|%PAYMENT_DATE_2%|%AMOUNT_2%/gi;
 
                 // ------------------------------------------
                 // (3) Replace values

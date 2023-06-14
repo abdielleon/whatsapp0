@@ -240,7 +240,7 @@ const sendApiMessage = async (req) => {
                 // ------------------------------------------
                 // (2) Create the regex
 
-                const regex = /%NAME%|%CODE%%|%LESSON_TIME%|%DAY_NAME%|%TIME_ZONE%|%VALUE_1%|%VALUE_2%|%VALUE_3%|%PAYMENT_COLLECTION_TEXT%/gi;
+                const regex = /%NAME%|%CODE%|%LESSON_TIME%|%DAY_NAME%|%TIME_ZONE%|%VALUE_1%|%VALUE_2%|%VALUE_3%|%PAYMENT_COLLECTION_TEXT%/gi;
 
                 // ------------------------------------------
                 // (3) Replace values

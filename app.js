@@ -210,6 +210,12 @@ const sendApiMessage = async (req) => {
             let {lesson_time, day_name, time_zone} = contact;
             let {value_1, value_2, value_3}        = contact;
 
+            // Messages sent full text
+            let {message_text}            = contact;
+            let {message_text_1}          = contact;
+            let {message_text_2}          = contact;
+            let {message_text_3}          = contact;
+            let {message_text_4}          = contact;
             let {payment_collection_text} = contact;
 
             // console.log('contact: ');
@@ -227,20 +233,27 @@ const sendApiMessage = async (req) => {
                     "%NAME%" : name ?? '',
                     
                     "%CODE%" : code ?? '',
+                    
                     "%LESSON_TIME%" : lesson_time ?? '',
                     "%DAY_NAME%"    : day_name    ?? '',
                     "%TIME_ZONE%"   : time_zone   ?? '',
+
                     "%VALUE_1%" : value_1 ?? '',
                     "%VALUE_2%" : value_2 ?? '',
                     "%VALUE_3%" : value_3 ?? '',
                     
                     "%PAYMENT_COLLECTION_TEXT%" : payment_collection_text ?? '',
+                    "%MESSAGE_TEXT%"   : message_text ?? '',
+                    "%MESSAGE_TEXT_1%" : message_text_1 ?? '',
+                    "%MESSAGE_TEXT_2%" : message_text_2 ?? '',
+                    "%MESSAGE_TEXT_3%" : message_text_3 ?? '',
+                    "%MESSAGE_TEXT_4%" : message_text_4 ?? '',
                 };
 
                 // ------------------------------------------
                 // (2) Create the regex
 
-                const regex = /%NAME%|%CODE%|%LESSON_TIME%|%DAY_NAME%|%TIME_ZONE%|%VALUE_1%|%VALUE_2%|%VALUE_3%|%PAYMENT_COLLECTION_TEXT%/gi;
+                const regex = /%NAME%|%CODE%|%LESSON_TIME%|%DAY_NAME%|%TIME_ZONE%|%VALUE_1%|%VALUE_2%|%VALUE_3%|%PAYMENT_COLLECTION_TEXT%|%MESSAGE_TEXT%|%MESSAGE_TEXT_1%|%MESSAGE_TEXT_2%|%MESSAGE_TEXT_3%|%MESSAGE_TEXT_4%/gi;
 
                 // ------------------------------------------
                 // (3) Replace values

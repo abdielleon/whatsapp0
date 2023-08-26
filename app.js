@@ -171,7 +171,7 @@ app.get('/api/chatbot/send-messages', (req, res) => {
 });
 app.post('/api/chatbot/send-messages', async (req, res) => {
 
-    // Add validation here using 'passport'
+    // Add validation here using 'passport' 
     // https://levelup.gitconnected.com/node-js-basics-add-authentication-to-an-express-app-with-passport-55a181105263
 
     const trigger = req.body.trigger;

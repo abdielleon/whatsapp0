@@ -127,10 +127,15 @@ app.use(express.static(__dirname + '/static', { dotfiles: 'allow' }))
 /**
  * Start the action
  */
+ const wwebVersion = '2.2407.3';
 
  const client = new Client({
     authStrategy: new LocalAuth(),
-    puppeteer: { headless: true }
+    puppeteer: { headless: true },
+    webVersionCache: {
+        type: 'remote',
+        remotePath: `https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/${wwebVersion}.html`,
+    }
 });
 
 client.on('qr', qr => {

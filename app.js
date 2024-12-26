@@ -272,6 +272,7 @@ const sendApiMessage = async (req) => {
                 // Wait after every text in sent
                 await randomDelayFunction(Number(process.env.API_MESSAGES_DELAY), 0.5);
             }
+            return {message: "Messages sent, check WhatsApp to confirm."};
         }
     } catch (err) {
         return err;

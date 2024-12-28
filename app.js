@@ -226,53 +226,63 @@ const sendApiMessage = async (req) => {
             // console.log('contact: ');
             // console.log(contact);
 
-            for (const message of messages){
+            const results = [];
 
-                let text = message;
+            for await (const message of messages){
 
-                // ------------------------------------------
-                // (1) map the values
-
-                // Values to be replaced
-                const mapObj = {
-                    "%NAME%" : name ?? '',
+                try {
+                    let text = message;
+    
+                    // ------------------------------------------
+                    // (1) map the values
+    
+                    // Values to be replaced
+                    const mapObj = {
+                        "%NAME%" : name ?? '',
+                        
+                        "%CODE%" : code ?? '',
+                        
+                        "%LESSON_TIME%" : lesson_time ?? '',
+                        "%DAY_NAME%"    : day_name    ?? '',
+                        "%TIME_ZONE%"   : time_zone   ?? '',
+    
+                        "%VALUE_1%" : value_1 ?? '',
+                        "%VALUE_2%" : value_2 ?? '',
+                        "%VALUE_3%" : value_3 ?? '',
+                        
+                        "%PAYMENT_COLLECTION_TEXT%" : payment_collection_text ?? '',
+                        "%MESSAGE_TEXT%"   : message_text ?? '',
+                        "%MESSAGE_TEXT_1%" : message_text_1 ?? '',
+                        "%MESSAGE_TEXT_2%" : message_text_2 ?? '',
+                        "%MESSAGE_TEXT_3%" : message_text_3 ?? '',
+                        "%MESSAGE_TEXT_4%" : message_text_4 ?? '',
+                    };
+    
+                    // ------------------------------------------
+                    // (2) Create the regex
+    
+                    const regex = /%NAME%|%CODE%|%LESSON_TIME%|%DAY_NAME%|%TIME_ZONE%|%VALUE_1%|%VALUE_2%|%VALUE_3%|%PAYMENT_COLLECTION_TEXT%|%MESSAGE_TEXT%|%MESSAGE_TEXT_1%|%MESSAGE_TEXT_2%|%MESSAGE_TEXT_3%|%MESSAGE_TEXT_4%/gi;
+    
+                    // ------------------------------------------
+                    // (3) Replace values
+                    text = text.replace(regex, matched => mapObj[matched]);
+    
+                    // ------------------------------------------
+                    // Send message
+                    console.log('Will send message', new Date());
+                    await sendMessage (client, number, text, trigger);
+    
+                    // Wait after every text in sent
+                    await randomDelayFunction(Number(process.env.API_MESSAGES_DELAY), 0.5);
                     
-                    "%CODE%" : code ?? '',
-                    
-                    "%LESSON_TIME%" : lesson_time ?? '',
-                    "%DAY_NAME%"    : day_name    ?? '',
-                    "%TIME_ZONE%"   : time_zone   ?? '',
+                    results.push({code,text});
 
-                    "%VALUE_1%" : value_1 ?? '',
-                    "%VALUE_2%" : value_2 ?? '',
-                    "%VALUE_3%" : value_3 ?? '',
-                    
-                    "%PAYMENT_COLLECTION_TEXT%" : payment_collection_text ?? '',
-                    "%MESSAGE_TEXT%"   : message_text ?? '',
-                    "%MESSAGE_TEXT_1%" : message_text_1 ?? '',
-                    "%MESSAGE_TEXT_2%" : message_text_2 ?? '',
-                    "%MESSAGE_TEXT_3%" : message_text_3 ?? '',
-                    "%MESSAGE_TEXT_4%" : message_text_4 ?? '',
-                };
+                } catch (error) {
+                    results.push({error});
+                }
 
-                // ------------------------------------------
-                // (2) Create the regex
-
-                const regex = /%NAME%|%CODE%|%LESSON_TIME%|%DAY_NAME%|%TIME_ZONE%|%VALUE_1%|%VALUE_2%|%VALUE_3%|%PAYMENT_COLLECTION_TEXT%|%MESSAGE_TEXT%|%MESSAGE_TEXT_1%|%MESSAGE_TEXT_2%|%MESSAGE_TEXT_3%|%MESSAGE_TEXT_4%/gi;
-
-                // ------------------------------------------
-                // (3) Replace values
-                text = text.replace(regex, matched => mapObj[matched]);
-
-                // ------------------------------------------
-                // Send message
-                console.log('Will send message', new Date());
-                await sendMessage (client, number, text, trigger);
-
-                // Wait after every text in sent
-                await randomDelayFunction(Number(process.env.API_MESSAGES_DELAY), 0.5);
             }
-            return {message: "Messages sent, check WhatsApp to confirm."};
+            return {results,message: "Messages processed, check WhatsApp to confirm delivery."};
         }
     } catch (err) {
         return err;

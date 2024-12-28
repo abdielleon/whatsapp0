@@ -274,7 +274,7 @@ const sendApiMessage = async (req) => {
                 await randomDelayFunction(Number(process.env.API_MESSAGES_DELAY), 0.5);
 
             }
-            results.push({code,messages});
+            results.push(contact);
         }
     } catch (err) {
         results.push({err});

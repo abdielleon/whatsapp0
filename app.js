@@ -207,6 +207,7 @@ const sendApiMessage = async (req) => {
     const results = [];
     
     try {
+        const justSent = [];
         for await ( const contact of contacts ) {
 
             // Wait before sending text/s to each contact
@@ -224,6 +225,8 @@ const sendApiMessage = async (req) => {
             let {message_text_4}          = contact;
             let {payment_collection_text} = contact;
 
+            if (justSent.includes(number)) continue;
+            justSent.push(number);
             // console.log('contact: ');
             // console.log(contact);
 

@@ -200,7 +200,7 @@ const sendApiMessage = async (req) => {
     const messages = req.body.messages;
     const from = req.body.from;
     const results = [];
-    const justSent = [];
+    const justSentTo = [];
     let sendTwiceAvoidedCount = 0;
     try {
         for await ( const contact of contacts ) {
@@ -219,15 +219,15 @@ const sendApiMessage = async (req) => {
             let {message_text_4}          = contact;
             let {payment_collection_text} = contact;
 
-            if ( justSent.includes(number)){
-                sendTwiceAvoidedCount++;
-                console.log('☺ from: ', from);
-                continue;
-                // if (from != '5491133612411@c.us'){ // Do it only if not local
-                // }
+            if ( justSentTo.includes(number)){
+                if (from != '5491133612411@c.us'){ // Do it only if not local
+                    sendTwiceAvoidedCount++;
+                    console.log('☺ from: ', from);
+                    continue;
+                }
             }
-            justSent.push(number);
-            console.log('Already sent (justSent): '+justSent);
+            justSentTo.push(number);
+            console.log('Already sent (justSentTo): '+justSentTo);
 
             for (const message of messages){
                 let text = message;
@@ -273,7 +273,7 @@ const sendApiMessage = async (req) => {
         results.push({err});
         // return err;
     }
-    return {results,message: "Messages processed, check WhatsApp to confirm delivery.",sendTwiceAvoidedCount,justSent};
+    return {results,message: "Messages processed, check WhatsApp to confirm delivery.",sendTwiceAvoidedCount,justSentTo};
 }
 /**
  *

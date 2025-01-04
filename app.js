@@ -196,19 +196,14 @@ app.post('/api/chatbot/send-messages', async (req, res) => {
 });
 const sendApiMessage = async (req) => {
     const contacts = req.body.contacts;
-    // const message = req.body.message;
     const trigger = req.body.trigger;
-
     const messages = req.body.messages;
-
-    // console.log("🚀 ~ req.body", req.body);
+    const from = req.body.from;
     const results = [];
-    let sendTwiceAvoidedNum = 0;
-    
+    const justSent = [];
+    let sendTwiceAvoidedCount = 0;
     try {
-        const justSent = [];
         for await ( const contact of contacts ) {
-
             // Wait before sending text/s to each contact
             // await randomDelayFunction(Number(process.env.API_MESSAGES_DELAY), 0.5);
 
@@ -224,22 +219,20 @@ const sendApiMessage = async (req) => {
             let {message_text_4}          = contact;
             let {payment_collection_text} = contact;
 
-            if (justSent.includes(number)){
-                sendTwiceAvoidedNum++;
-                continue;
+            if ( justSent.includes(number)){
+                if (from != '5491133612411@c.us'){ // Do it only if not local
+                    sendTwiceAvoidedCount++;
+                    console.log('☺ from: ', from);
+                    continue;
+                }
             }
             justSent.push(number);
-            console.log('Already sent: '+justSent);
-            // console.log('contact: ');
-            // console.log(contact);
+            console.log('Already sent (justSent): '+justSent);
 
             for (const message of messages){
-
                 let text = message;
-
                 // ------------------------------------------
                 // (1) map the values
-
                 // Values to be replaced
                 const mapObj = {
                     "%NAME%" : name ?? '',
@@ -261,24 +254,18 @@ const sendApiMessage = async (req) => {
                     "%MESSAGE_TEXT_3%" : message_text_3 ?? '',
                     "%MESSAGE_TEXT_4%" : message_text_4 ?? '',
                 };
-
                 // ------------------------------------------
                 // (2) Create the regex
-
                 const regex = /%NAME%|%CODE%|%LESSON_TIME%|%DAY_NAME%|%TIME_ZONE%|%VALUE_1%|%VALUE_2%|%VALUE_3%|%PAYMENT_COLLECTION_TEXT%|%MESSAGE_TEXT%|%MESSAGE_TEXT_1%|%MESSAGE_TEXT_2%|%MESSAGE_TEXT_3%|%MESSAGE_TEXT_4%/gi;
-
                 // ------------------------------------------
                 // (3) Replace values
                 text = text.replace(regex, matched => mapObj[matched]);
-
                 // ------------------------------------------
                 // Send message
                 console.log('Will send message', new Date());
                 await sendMessage (client, number, text, trigger);
-
                 // Wait after every text in sent
                 await randomDelayFunction(Number(process.env.API_MESSAGES_DELAY), 0.5);
-
             }
             results.push(contact);
         }
@@ -286,7 +273,7 @@ const sendApiMessage = async (req) => {
         results.push({err});
         // return err;
     }
-    return {results,message: "Messages processed, check WhatsApp to confirm delivery.",sendTwiceAvoidedNum};
+    return {results,message: "Messages processed, check WhatsApp to confirm delivery.",sendTwiceAvoidedCount,justSent};
 }
 /**
  *
@@ -297,7 +284,7 @@ const sendApiMessage = async (req) => {
     return new Promise(resolve => {
         setTimeout(resolve, milliseconds);
     });
-}
+ }
 /**
  *
  * @param {Int} milliseconds  approximate time to wait
@@ -305,14 +292,11 @@ const sendApiMessage = async (req) => {
  * @returns Promise
  */
  const randomDelayFunction = async (milliseconds, timeFloat = null) => {
-
     let range = Number(milliseconds * timeFloat);
-
     // Random time witihin a margin of ms over and ms under the declared milliseconds
     const randomTime = Math.floor(Math.random() * (Number(milliseconds) + range + 1));
-
     return await delayFunction(randomTime);
-}
+ }
 /* End Abdiel API */
 
 // -------------------------------------------------------------------------------------

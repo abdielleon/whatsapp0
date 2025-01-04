@@ -179,19 +179,32 @@ app.post('/api/chatbot/send-messages', async (req, res) => {
     // Add validation here using 'passport' 
     // https://levelup.gitconnected.com/node-js-basics-add-authentication-to-an-express-app-with-passport-55a181105263
 
+    // --------------------------------------------
+    // Set request timeout
+    // --------------------------------------------
+    const contacts = req.body.contacts;
+    const messages = req.body.messages;
+
+    let contactsCount = 0; for(const contact of contacts){ contactsCount++; }
+    const messagesCount = messages.length;
+    const apiMessagesDelay = Number(process.env.API_MESSAGES_DELAY);
+
+    const resDelay = contactsCount * messagesCount * apiMessagesDelay
+    req.setTimeout(resDelay);
+    console.log("🚀 ~ resDelay:", resDelay);
+
+    // --------------------------------------------
     const trigger = req.body.trigger;
     let responseText = 'No action.';
-
     // console.log('💡 💡 💡 req: '); //
     console.log('Entered api: ', new Date());
     console.log(req.body);
 
     if (trigger == 'te-io'){
         responseText = await sendApiMessage(req);
-        res.send(responseText);
+        res.send(responseText,);
         return;
     }
-
     res.send(responseText);
 });
 const sendApiMessage = async (req) => {

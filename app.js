@@ -220,11 +220,11 @@ const sendApiMessage = async (req) => {
             let {payment_collection_text} = contact;
 
             if ( justSent.includes(number)){
-                if (from != '5491133612411@c.us'){ // Do it only if not local
-                    sendTwiceAvoidedCount++;
-                    console.log('☺ from: ', from);
-                    continue;
-                }
+                sendTwiceAvoidedCount++;
+                console.log('☺ from: ', from);
+                continue;
+                // if (from != '5491133612411@c.us'){ // Do it only if not local
+                // }
             }
             justSent.push(number);
             console.log('Already sent (justSent): '+justSent);

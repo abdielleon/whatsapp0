@@ -186,7 +186,6 @@ app.post('/api/chatbot/send-messages', async (req, res) => {
     console.log('Entered api: ', new Date());
     console.log(req.body);
 
-
     if (trigger == 'te-io'){
         responseText = await sendApiMessage(req);
         res.send(responseText);
@@ -194,7 +193,6 @@ app.post('/api/chatbot/send-messages', async (req, res) => {
     }
 
     res.send(responseText);
-
 });
 const sendApiMessage = async (req) => {
     const contacts = req.body.contacts;
@@ -205,6 +203,7 @@ const sendApiMessage = async (req) => {
 
     // console.log("🚀 ~ req.body", req.body);
     const results = [];
+    let sendTwiceAvoidedNum = 0;
     
     try {
         const justSent = [];
@@ -225,8 +224,12 @@ const sendApiMessage = async (req) => {
             let {message_text_4}          = contact;
             let {payment_collection_text} = contact;
 
-            if (justSent.includes(number)) continue;
+            if (justSent.includes(number)){
+                sendTwiceAvoidedNum++;
+                continue;
+            }
             justSent.push(number);
+            console.log('Already sent: '+justSent);
             // console.log('contact: ');
             // console.log(contact);
 
@@ -283,7 +286,7 @@ const sendApiMessage = async (req) => {
         results.push({err});
         // return err;
     }
-    return {results,message: "Messages processed, check WhatsApp to confirm delivery."};
+    return {results,message: "Messages processed, check WhatsApp to confirm delivery.",sendTwiceAvoidedNum};
 }
 /**
  *

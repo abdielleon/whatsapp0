@@ -216,81 +216,155 @@ const sendApiMessage = async (req) => {
     let sendTwiceAvoidedCount = 0;
 
     const contactGroupSize = 5;
-    const groupedContacts = [];
+    const contactGroups = [];
     for (let i = 0; i < contacts.length; i += contactGroupSize) {
-        groupedContacts.push(contacts.slice(i, i + contactGroupSize));
+        contactGroups.push(contacts.slice(i, i + contactGroupSize));
     }
 
-    try {
-        for await ( const contact of groupedContacts ) {
-            // Wait before sending text/s to each contact
-            // await randomDelayFunction(Number(process.env.API_MESSAGES_DELAY), 0.5);
-
-            let {name, number, code}               = contact;
-            let {lesson_time, day_name, time_zone} = contact;
-            let {value_1, value_2, value_3}        = contact;
-
-            // Messages sent full text
-            let {message_text}            = contact;
-            let {message_text_1}          = contact;
-            let {message_text_2}          = contact;
-            let {message_text_3}          = contact;
-            let {message_text_4}          = contact;
-            let {payment_collection_text} = contact;
-
-            if ( justSentTo.includes(number)){
-                if (from != '5491133612411@c.us'){ // Do it only if not local
-                    sendTwiceAvoidedCount++;
-                    console.log('☺ from: ', from);
-                    continue;
+    contactGroups.forEach( async contactGroup => {
+        try {
+            for await ( const contact of contactGroup ) {
+                // Wait before sending text/s to each contact
+                // await randomDelayFunction(Number(process.env.API_MESSAGES_DELAY), 0.5);
+    
+                let {name, number, code}               = contact;
+                let {lesson_time, day_name, time_zone} = contact;
+                let {value_1, value_2, value_3}        = contact;
+    
+                // Messages sent full text
+                let {message_text}            = contact;
+                let {message_text_1}          = contact;
+                let {message_text_2}          = contact;
+                let {message_text_3}          = contact;
+                let {message_text_4}          = contact;
+                let {payment_collection_text} = contact;
+    
+                if ( justSentTo.includes(number)){
+                    if (from != '5491133612411@c.us'){ // Do it only if not local
+                        sendTwiceAvoidedCount++;
+                        console.log('☺ from: ', from);
+                        continue;
+                    }
                 }
+                justSentTo.push(number);
+                console.log('Already sent (justSentTo): '+justSentTo);
+    
+                for (const message of messages){
+                    let text = message;
+                    // ------------------------------------------
+                    // (1) map the values
+                    // Values to be replaced
+                    const mapObj = {
+                        "%NAME%" : name ?? '',
+                        
+                        "%CODE%" : code ?? '',
+                        
+                        "%LESSON_TIME%" : lesson_time ?? '',
+                        "%DAY_NAME%"    : day_name    ?? '',
+                        "%TIME_ZONE%"   : time_zone   ?? '',
+    
+                        "%VALUE_1%" : value_1 ?? '',
+                        "%VALUE_2%" : value_2 ?? '',
+                        "%VALUE_3%" : value_3 ?? '',
+                        
+                        "%PAYMENT_COLLECTION_TEXT%" : payment_collection_text ?? '',
+                        "%MESSAGE_TEXT%"   : message_text ?? '',
+                        "%MESSAGE_TEXT_1%" : message_text_1 ?? '',
+                        "%MESSAGE_TEXT_2%" : message_text_2 ?? '',
+                        "%MESSAGE_TEXT_3%" : message_text_3 ?? '',
+                        "%MESSAGE_TEXT_4%" : message_text_4 ?? '',
+                    };
+                    // ------------------------------------------
+                    // (2) Create the regex
+                    const regex = /%NAME%|%CODE%|%LESSON_TIME%|%DAY_NAME%|%TIME_ZONE%|%VALUE_1%|%VALUE_2%|%VALUE_3%|%PAYMENT_COLLECTION_TEXT%|%MESSAGE_TEXT%|%MESSAGE_TEXT_1%|%MESSAGE_TEXT_2%|%MESSAGE_TEXT_3%|%MESSAGE_TEXT_4%/gi;
+                    // ------------------------------------------
+                    // (3) Replace values
+                    text = text.replace(regex, matched => mapObj[matched]);
+                    // ------------------------------------------
+                    // Send message
+                    console.log('Will send message', new Date());
+                    await sendMessage (client, number, text, trigger);
+                    // Wait after every text in sent
+                    await randomDelayFunction(Number(process.env.API_MESSAGES_DELAY), 0.5);
+                }
+                results.push(contact);
             }
-            justSentTo.push(number);
-            console.log('Already sent (justSentTo): '+justSentTo);
-
-            for (const message of messages){
-                let text = message;
-                // ------------------------------------------
-                // (1) map the values
-                // Values to be replaced
-                const mapObj = {
-                    "%NAME%" : name ?? '',
-                    
-                    "%CODE%" : code ?? '',
-                    
-                    "%LESSON_TIME%" : lesson_time ?? '',
-                    "%DAY_NAME%"    : day_name    ?? '',
-                    "%TIME_ZONE%"   : time_zone   ?? '',
-
-                    "%VALUE_1%" : value_1 ?? '',
-                    "%VALUE_2%" : value_2 ?? '',
-                    "%VALUE_3%" : value_3 ?? '',
-                    
-                    "%PAYMENT_COLLECTION_TEXT%" : payment_collection_text ?? '',
-                    "%MESSAGE_TEXT%"   : message_text ?? '',
-                    "%MESSAGE_TEXT_1%" : message_text_1 ?? '',
-                    "%MESSAGE_TEXT_2%" : message_text_2 ?? '',
-                    "%MESSAGE_TEXT_3%" : message_text_3 ?? '',
-                    "%MESSAGE_TEXT_4%" : message_text_4 ?? '',
-                };
-                // ------------------------------------------
-                // (2) Create the regex
-                const regex = /%NAME%|%CODE%|%LESSON_TIME%|%DAY_NAME%|%TIME_ZONE%|%VALUE_1%|%VALUE_2%|%VALUE_3%|%PAYMENT_COLLECTION_TEXT%|%MESSAGE_TEXT%|%MESSAGE_TEXT_1%|%MESSAGE_TEXT_2%|%MESSAGE_TEXT_3%|%MESSAGE_TEXT_4%/gi;
-                // ------------------------------------------
-                // (3) Replace values
-                text = text.replace(regex, matched => mapObj[matched]);
-                // ------------------------------------------
-                // Send message
-                console.log('Will send message', new Date());
-                await sendMessage (client, number, text, trigger);
-                // Wait after every text in sent
-                await randomDelayFunction(Number(process.env.API_MESSAGES_DELAY), 0.5);
-            }
-            results.push(contact);
+        } catch (err) {
+            results.push({err}); // return err;
         }
-    } catch (err) {
-        results.push({err}); // return err;
-    }
+    });
+
+
+    // try {
+    //     for await ( const contact of contacts ) {
+    //         // Wait before sending text/s to each contact
+    //         // await randomDelayFunction(Number(process.env.API_MESSAGES_DELAY), 0.5);
+
+    //         let {name, number, code}               = contact;
+    //         let {lesson_time, day_name, time_zone} = contact;
+    //         let {value_1, value_2, value_3}        = contact;
+
+    //         // Messages sent full text
+    //         let {message_text}            = contact;
+    //         let {message_text_1}          = contact;
+    //         let {message_text_2}          = contact;
+    //         let {message_text_3}          = contact;
+    //         let {message_text_4}          = contact;
+    //         let {payment_collection_text} = contact;
+
+    //         if ( justSentTo.includes(number)){
+    //             if (from != '5491133612411@c.us'){ // Do it only if not local
+    //                 sendTwiceAvoidedCount++;
+    //                 console.log('☺ from: ', from);
+    //                 continue;
+    //             }
+    //         }
+    //         justSentTo.push(number);
+    //         console.log('Already sent (justSentTo): '+justSentTo);
+
+    //         for (const message of messages){
+    //             let text = message;
+    //             // ------------------------------------------
+    //             // (1) map the values
+    //             // Values to be replaced
+    //             const mapObj = {
+    //                 "%NAME%" : name ?? '',
+                    
+    //                 "%CODE%" : code ?? '',
+                    
+    //                 "%LESSON_TIME%" : lesson_time ?? '',
+    //                 "%DAY_NAME%"    : day_name    ?? '',
+    //                 "%TIME_ZONE%"   : time_zone   ?? '',
+
+    //                 "%VALUE_1%" : value_1 ?? '',
+    //                 "%VALUE_2%" : value_2 ?? '',
+    //                 "%VALUE_3%" : value_3 ?? '',
+                    
+    //                 "%PAYMENT_COLLECTION_TEXT%" : payment_collection_text ?? '',
+    //                 "%MESSAGE_TEXT%"   : message_text ?? '',
+    //                 "%MESSAGE_TEXT_1%" : message_text_1 ?? '',
+    //                 "%MESSAGE_TEXT_2%" : message_text_2 ?? '',
+    //                 "%MESSAGE_TEXT_3%" : message_text_3 ?? '',
+    //                 "%MESSAGE_TEXT_4%" : message_text_4 ?? '',
+    //             };
+    //             // ------------------------------------------
+    //             // (2) Create the regex
+    //             const regex = /%NAME%|%CODE%|%LESSON_TIME%|%DAY_NAME%|%TIME_ZONE%|%VALUE_1%|%VALUE_2%|%VALUE_3%|%PAYMENT_COLLECTION_TEXT%|%MESSAGE_TEXT%|%MESSAGE_TEXT_1%|%MESSAGE_TEXT_2%|%MESSAGE_TEXT_3%|%MESSAGE_TEXT_4%/gi;
+    //             // ------------------------------------------
+    //             // (3) Replace values
+    //             text = text.replace(regex, matched => mapObj[matched]);
+    //             // ------------------------------------------
+    //             // Send message
+    //             console.log('Will send message', new Date());
+    //             await sendMessage (client, number, text, trigger);
+    //             // Wait after every text in sent
+    //             await randomDelayFunction(Number(process.env.API_MESSAGES_DELAY), 0.5);
+    //         }
+    //         results.push(contact);
+    //     }
+    // } catch (err) {
+    //     results.push({err}); // return err;
+    // }
     return {results,message: "Messages processed, check WhatsApp to confirm delivery.",sendTwiceAvoidedCount,justSentTo};
 }
 /**

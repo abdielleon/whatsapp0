@@ -219,6 +219,7 @@ const sendApiMessage = async (req) => {
     const contactGroups = [];
     for (let i = 0; i < contacts.length; i += contactGroupSize) {
         contactGroups.push(contacts.slice(i, i + contactGroupSize));
+        await new Promise(resolve => setTimeout(resolve, 0));
     }
 
     contactGroups.forEach( async contactGroup => {

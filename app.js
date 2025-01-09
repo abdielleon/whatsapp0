@@ -190,8 +190,7 @@ app.post('/api/chatbot/send-messages', async (req, res) => {
     const apiMessagesDelay = Number(process.env.API_MESSAGES_DELAY);
 
     const resDelay = contactsCount * messagesCount * apiMessagesDelay
-    req.setTimeout(resDelay);
-    console.log("🚀 ~ resDelay:", resDelay);
+    req.setTimeout(resDelay); // console.log("🚀 ~ resDelay:", resDelay);
 
     // --------------------------------------------
     const trigger = req.body.trigger;
@@ -215,8 +214,15 @@ const sendApiMessage = async (req) => {
     const results = [];
     const justSentTo = [];
     let sendTwiceAvoidedCount = 0;
+
+    const contactGroupSize = 5;
+    const groupedContacts = [];
+    for (let i = 0; i < contacts.length; i += contactGroupSize) {
+        groupedContacts.push(contacts.slice(i, i + contactGroupSize));
+    }
+
     try {
-        for await ( const contact of contacts ) {
+        for await ( const contact of groupedContacts ) {
             // Wait before sending text/s to each contact
             // await randomDelayFunction(Number(process.env.API_MESSAGES_DELAY), 0.5);
 
@@ -283,8 +289,7 @@ const sendApiMessage = async (req) => {
             results.push(contact);
         }
     } catch (err) {
-        results.push({err});
-        // return err;
+        results.push({err}); // return err;
     }
     return {results,message: "Messages processed, check WhatsApp to confirm delivery.",sendTwiceAvoidedCount,justSentTo};
 }

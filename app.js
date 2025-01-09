@@ -221,6 +221,9 @@ const sendApiMessage = async (req) => {
         contactGroups.push(contacts.slice(i, i + contactGroupSize));
         await new Promise(resolve => setTimeout(resolve, 0));
     }
+    
+    console.log("🚀 ~ contactGroups:", contactGroups);
+    
 
     contactGroups.forEach( async contactGroup => {
         try {
@@ -241,7 +244,7 @@ const sendApiMessage = async (req) => {
                 let {payment_collection_text} = contact;
     
                 if ( justSentTo.includes(number)){
-                    if (from != '5491133612411@c.us' && number != '+5491133612411'){ // Do it only if not local
+                    if (from != '5491133612411' && number != '+5491133612411'){ // Do it only if not local
                         sendTwiceAvoidedCount++;
                         console.log('☺ from: ', from);
                         continue;

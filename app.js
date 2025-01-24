@@ -244,7 +244,7 @@ const sendApiMessage = async (req) => {
                 let {payment_collection_text} = contact;
     
                 if ( justSentTo.includes(number)){
-                    if (from != '5491133612411'){ // Do it only if not local
+                    if (from != '5491133612411' && number != '5491133612411@c.us'){ // Do it only if not local
                         sendTwiceAvoidedCount++;
                         console.log('☺ from: ', from);
                         continue;

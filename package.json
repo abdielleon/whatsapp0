@@ -28,7 +28,7 @@
     "stable": "^0.1.8",
     "stormdb": "^0.6.0",
     "uuid": "^8.3.2",
-    "whatsapp-web.js": "^1.21.0"
+    "whatsapp-web.js": "git://github.com/pedroslopez/whatsapp-web.js#main"
   },
   "repository": {
     "type": "git",

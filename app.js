@@ -139,10 +139,10 @@ app.use(express.static(__dirname + '/static', { dotfiles: 'allow' }))
             '--disable-accelerated-mhtml-generation', // Added for potential stability
             '--disable-gpu',            // Disables GPU hardware acceleration
         ],
-    webVersionCache: {
-        type: 'remote',
-        remotePath: `https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/${wwebVersion}.html`,
-    }
+    // webVersionCache: {
+    //     type: 'remote',
+    //     remotePath: `https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/${wwebVersion}.html`,
+    // }
 });
 
 client.on('qr', qr => {

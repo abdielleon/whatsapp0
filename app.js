@@ -131,7 +131,7 @@ app.use(express.static(__dirname + '/static', { dotfiles: 'allow' }))
 
  const client = new Client({
     authStrategy: new LocalAuth(),
-    puppeteer: { headless: false }, // Originally true
+    puppeteer: { headless: true }, // Should be true, set to false only for debugging
     args: [
             '--no-sandbox',             // Essential for running as non-root on Linux/Docker
             '--disable-setuid-sandbox', // Related to the above

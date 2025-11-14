@@ -261,6 +261,7 @@ const sendApiMessage = async (req) => {
     
                 for (const message of messages){
                     let text = message;
+
                     // ------------------------------------------
                     // (1) map the values
                     // Values to be replaced
@@ -290,16 +291,31 @@ const sendApiMessage = async (req) => {
                     // ------------------------------------------
                     // (3) Replace values
                     text = text.replace(regex, matched => mapObj[matched]);
+
+                    // 🚨 DEBUG
+                    console.log(`Attempting to send message to ${number}: "${text.substring(0, 30)}..."`);
+
                     // ------------------------------------------
                     // Send message
-                    console.log('Will send message', new Date());
-                    await sendMessage (client, number, text, trigger);
+                    try{
+                        console.log('Will send message', new Date());
+                        const messageResult = await sendMessage (client, number, text, trigger);
+    
+                        // Log successful send (messageResult usually contains the ID or status)
+                        console.log(`✅ Message sent successfully to ${number}. Status: ${messageResult.id.id}`);
+                    } catch(err){
+                        // 🚨 DEBUG
+                        console.error(`❌ FAILED to send message to ${number}:`, err.message || err);
+                    }
+
                     // Wait after every text in sent
                     await randomDelayFunction(Number(process.env.API_MESSAGES_DELAY), 0.5);
                 }
                 results.push(contact);
             }
         } catch (err) {
+
+            console.error(`❌ Error: ${number}:`, err);
             results.push({err}); // return err;
         }
     };

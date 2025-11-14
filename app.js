@@ -131,7 +131,7 @@ app.use(express.static(__dirname + '/static', { dotfiles: 'allow' }))
 
  const client = new Client({
     authStrategy: new LocalAuth(),
-    puppeteer: { headless: false }, // Originally true
+    puppeteer: { headless: true }, // Originally true
     webVersionCache: {
         type: 'remote',
         remotePath: `https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/${wwebVersion}.html`,

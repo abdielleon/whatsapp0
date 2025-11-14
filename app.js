@@ -231,8 +231,7 @@ const sendApiMessage = async (req) => {
     
     console.log("🚀 ~ contactGroups:", contactGroups);
     
-
-    contactGroups.forEach( async contactGroup => {
+    for (const contactGroup of contactGroups) {
         try {
             for await ( const contact of contactGroup ) {
                 // Wait before sending text/s to each contact
@@ -303,7 +302,7 @@ const sendApiMessage = async (req) => {
         } catch (err) {
             results.push({err}); // return err;
         }
-    });
+    };
 
 
     // try {

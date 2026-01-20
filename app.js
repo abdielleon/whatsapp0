@@ -127,7 +127,7 @@ app.use(express.static(__dirname + '/static', { dotfiles: 'allow' }))
 /**
  * Start the action
  */
-//  const wwebVersion = '2.2412.54';
+ const wwebVersion = '2.2412.54';
 
  const client = new Client({
     authStrategy: new LocalAuth(),

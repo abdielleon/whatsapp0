@@ -303,7 +303,7 @@ const sendApiMessage = async (req) => {
 
                     try {
                         console.log('Will send message', new Date());
-                        const response = await sendMessage(contact.number, text, { sendSeen: false });
+                        const response = await sendMessage(client, number, text, trigger, { sendSeen: false });
 
                         // Check if response exists BEFORE reading .id
                         if (response && response.id) {
@@ -316,6 +316,17 @@ const sendApiMessage = async (req) => {
                         // This only runs if the actual SENDING fails
                         console.log(`❌ FAILED to send message to ${contact.number}:`, err.message);
                     }
+
+                    // try{
+                    //     console.log('Will send message', new Date());
+                    //     const messageResult = await sendMessage (client, number, text, trigger);
+    
+                    //     // Log successful send (messageResult usually contains the ID or status)
+                    //     console.log(`✅ Message sent successfully to ${number}. Status: ${messageResult.id.id}`);
+                    // } catch(err){
+                    //     // 🚨 DEBUG
+                    //     console.error(`❌ FAILED to send message to ${number}:`, err.message || err);
+                    // }
 
                     // Wait after every text in sent
                     await randomDelayFunction(Number(process.env.API_MESSAGES_DELAY), 0.5);

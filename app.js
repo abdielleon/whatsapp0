@@ -300,15 +300,21 @@ const sendApiMessage = async (req) => {
 
                     // ------------------------------------------
                     // Send message
-                    try{
+
+                    try {
                         console.log('Will send message', new Date());
-                        const messageResult = await sendMessage (client, number, text, trigger);
-    
-                        // Log successful send (messageResult usually contains the ID or status)
-                        console.log(`✅ Message sent successfully to ${number}. Status: ${messageResult.id.id}`);
-                    } catch(err){
-                        // 🚨 DEBUG
-                        console.error(`❌ FAILED to send message to ${number}:`, err.message || err);
+                        const response = await sendMessage(contact.number, text, { sendSeen: false });
+
+                        // Check if response exists BEFORE reading .id
+                        if (response && response.id) {
+                            console.log(`✅ Message sent successfully to ${contact.number}. ID: ${response.id._serialized}`);
+                        } else {
+                            // If the message sent but response is empty, we still consider it a success
+                            console.log(`✅ Message sent to ${contact.number} (Response object was empty, but send was triggered)`);
+                        }
+                    } catch (err) {
+                        // This only runs if the actual SENDING fails
+                        console.log(`❌ FAILED to send message to ${contact.number}:`, err.message);
                     }
 
                     // Wait after every text in sent

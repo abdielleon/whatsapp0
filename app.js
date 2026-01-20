@@ -131,18 +131,20 @@ app.use(express.static(__dirname + '/static', { dotfiles: 'allow' }))
 
  const client = new Client({
     authStrategy: new LocalAuth(),
-    puppeteer: { headless: true }, // Should be true, set to false only for debugging
-    args: [
-            '--no-sandbox',             // Essential for running as non-root on Linux/Docker
-            '--disable-setuid-sandbox', // Related to the above
-            '--disable-dev-shm-usage',  // Critical for limited environments (e.g., Docker/PM2)
-            '--disable-accelerated-mhtml-generation', // Added for potential stability
-            '--disable-gpu',            // Disables GPU hardware acceleration
-        ],
-    // webVersionCache: {
-    //     type: 'remote',
-    //     remotePath: `https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/${wwebVersion}.html`,
-    // }
+    puppeteer: { 
+        headless: true,
+        args: [
+                '--no-sandbox',             // Essential for running as non-root on Linux/Docker
+                '--disable-setuid-sandbox', // Related to the above
+                '--disable-dev-shm-usage',  // Critical for limited environments (e.g., Docker/PM2)
+                '--disable-accelerated-mhtml-generation', // Added for potential stability
+                '--disable-gpu',            // Disables GPU hardware acceleration
+            ],
+    }, // Should be true, set to false only for debugging
+    webVersionCache: {
+        type: 'remote',
+        remotePath: `https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/${wwebVersion}.html`,
+    }
 });
 
 client.on('qr', qr => {

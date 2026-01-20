@@ -116,7 +116,7 @@ app.use(express.static(__dirname + '/static', { dotfiles: 'allow' }))
         const trigger = process.env.DIALOGFLOW_AGENT
 
         const abdielArgs = { sendSeen: false };
-        await sendMessage(client, message.from, response.replyMessage, trigger, abdielArgs);
+        await sendMessage(client, message.from, response.replyMessage, trigger);
         if (response.media) {
             sendMedia(client, message.from, response.media);
         }
